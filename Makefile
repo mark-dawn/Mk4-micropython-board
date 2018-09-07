@@ -1,7 +1,7 @@
 BOARD ?= MSP_EXP432E401Y_CC3120_EMF3
 BUILD ?= build-$(BOARD)
 
-include ../../py/mkenv.mk
+include $(TOP)/py/mkenv.mk
 -include mpconfigport.mk
 
 # qstr definitions (must come before including py.mk)

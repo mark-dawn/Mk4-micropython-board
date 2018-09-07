@@ -1281,6 +1281,45 @@ STATIC mp_obj_t ugfx_image_make_new(const mp_obj_type_t *type, mp_uint_t n_args,
 
 }
 
+/// \method display(x, y)
+///
+/// Display the image object at the specified coordinates
+STATIC mp_obj_t ugfx_image_display(mp_obj_t self_in, mp_obj_t x_in, mp_obj_t y_in) {
+    ugfx_image_obj_t *self = self_in;
+    coord_t x = mp_obj_get_int(x_in);
+    coord_t y = mp_obj_get_int(y_in);
+    coord_t w = (self->thisImage).width;
+    coord_t h = (self->thisImage).height;
+	coord_t err = gdispImageDraw(&(self->thisImage), x, y, w, h, 0, 0);
+    if (err != 0) {
+	    print_image_error(err);
+    }
+	return mp_const_none;
+}
+
+STATIC MP_DEFINE_CONST_FUN_OBJ_3(ugfx_image_display_obj, ugfx_image_display);
+
+/// \method next()
+///
+/// Returns the delay for the next frame if the image is an animated gif and advances the frame pointer.
+/// If the image has no frames returns TIME_INFINITE
+STATIC mp_obj_t ugfx_image_next(mp_obj_t self_in) {
+    ugfx_image_obj_t *self = self_in;
+    delaytime_t delay = gdispImageNext(&(self->thisImage));
+    return MP_OBJ_NEW_SMALL_INT(delay);
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_1(ugfx_image_next_obj, ugfx_image_next);
+
+/// \method bg_color(color)
+///
+/// Set the background color to use for multiple redraws
+STATIC mp_obj_t ugfx_image_bg_color(mp_obj_t self_in, mp_obj_t color_in) {
+    ugfx_image_obj_t *self = self_in;
+    color_t bg_color = mp_obj_get_int(color_in);
+    gdispImageSetBgColor(&(self->thisImage), bg_color);
+	return mp_const_none;
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_2(ugfx_image_bg_color_obj, ugfx_image_bg_color);
 
 /// \method close()
 ///
@@ -1300,7 +1339,9 @@ STATIC const mp_map_elem_t ugfx_image_locals_dict_table[] = {
     { MP_OBJ_NEW_QSTR(MP_QSTR_visible), (mp_obj_t)&ugfx_widget_visible_obj},
 	{ MP_OBJ_NEW_QSTR(MP_QSTR_style), (mp_obj_t)&ugfx_widget_style_obj },
 	{ MP_OBJ_NEW_QSTR(MP_QSTR_enabled), (mp_obj_t)&ugfx_widget_enabled_obj },
-
+    { MP_OBJ_NEW_QSTR(MP_QSTR_display), (mp_obj_t)&ugfx_image_display_obj },
+    { MP_OBJ_NEW_QSTR(MP_QSTR_next), (mp_obj_t)&ugfx_image_next_obj },
+    { MP_OBJ_NEW_QSTR(MP_QSTR_bg_color), (mp_obj_t)&ugfx_image_bg_color_obj },
 	//class constants
     //{ MP_OBJ_NEW_QSTR(MP_QSTR_RED),        MP_OBJ_NEW_SMALL_INT(Red) },
 
